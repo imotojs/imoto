@@ -14,8 +14,10 @@
 // example.js
 
 class example extends Imoto {
+  // 定义一波数据
   get styleSheet() {
-    return `h1 {...}` // 把样式写在这里
+    return `h1 {...}` // 默认为scoped，需要global与scoped时如下
+    return {global: ``, scoped: ``}
   },
   get data() {
     return {a: ...} // 该组件定义的内部变量或外部调用属性
@@ -25,12 +27,15 @@ class example extends Imoto {
       inputChange() {...} // 该组件定义的方法函数。从中可以通过this取得当前组件与其父类的data
     }
   },
-  get ready() {} // 页面渲染完成后自动调用，从中可以通过this取得当前组件与其父类的data
   get component() {
     return {
       example1: require(...)
     }
   },
+  // 生命周期相关
+  get created() {}, // 页面渲染前自动调用，从中可获得当前组件与其父类的props与data
+  get ready() {}, // 页面渲染完成后自动调用
+  // 定义模板
   get template() {
     return `<div>
       <span :text="a"></span>

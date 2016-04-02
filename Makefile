@@ -10,5 +10,5 @@ deploy: install
 		git clone git@github.com:youngerheart/imoto.git --branch gh-pages ghpages; \
 	fi; \
 	npm run deploy; \
-	cp dist/imoto.min.js ghpage && cd ghpages && git add .; \
+	cp -r dist ghpages && cd ghpages && git add .; \
 	git commit -m "update ghpages" && git push origin gh-pages -f
