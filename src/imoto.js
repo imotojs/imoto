@@ -1,22 +1,22 @@
 class Imoto {
   constructor(config) {
-    var pointer = {};
-    [config.props, config.data, config.method].forEach((obj) => {
+    var pointers = {};
+    [config.props, config.data, config.methods].forEach((obj) => {
       if (!obj) return;
       for (var key in obj) {
-        pointer[key] = obj[key];
+        pointers[key] = obj[key];
       }
     });
-    this.$$pointer = pointer;
+    this.$$pointers = pointers;
     this.$$el = config.el;
     this.$$template = config.template;
     this.$$styleSheet = config.styleSheet;
-    if (config.created) config.created.call(pointer);
+    if (config.created) config.created.call(pointers);
     // 调用渲染
     ['pubsub', 'initTemp', 'render', 'setStyle'].forEach((name) => {
       require(`./plugins/${name}`)(this);
     });
-    if (config.ready) config.ready.call(pointer);
+    if (config.ready) config.ready.call(pointers);
   }
   static use(plugin) {
     plugin(this);
