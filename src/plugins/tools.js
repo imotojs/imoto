@@ -5,8 +5,8 @@ module.exports = {
   getEls(query, el) {
     return (el || document).querySelectorAll(query);
   },
-  attrEls(el, attr, value) => {
-    return Array.prototype.slice.call(el.querySelectorAll('[' + attr + '=\'' + value + '\']'));
+  attrEls(el, attr, value) {
+    return Array.prototype.slice.call(el.querySelectorAll(`[${attr}=\'${value}\']`));
   },
   getVal(obj, str) {},
   setVal(obj, str, value) {}
