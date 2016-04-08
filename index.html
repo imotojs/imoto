@@ -9,6 +9,29 @@
 </body>
 <script type="text/javascript" src="dist/imoto.js"></script>
 <script type="text/javascript">
-  
+  new Imoto({
+    el: 'body',
+    styleSheet: '.lala{border: 1px}',
+    data: {
+      hehe: false
+    },
+    created: function() {
+    },
+    ready: function() {
+      this.hehe = true;
+    },
+    methods: {
+      duang: function() {
+        this.hehe = !this.hehe;
+      },
+      lala: function() {
+        console.log(this.hehe);
+      }
+    },
+    template: `
+      <button @click="duang">duang</button>
+      <div class="lala" :if="hehe" :text="hehe" @click="lala"></div>
+    `
+  });
 </script>
 </html>
