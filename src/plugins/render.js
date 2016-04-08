@@ -6,7 +6,7 @@ const {attrEls} = require('./tools');
 
 module.exports = (self) => {
   // 在初次赋值以及setter函数触发时调用，为当前变量绑定的VM完成指定行为
-  const setVMs = (VMs, newVal, data) => {
+  const setVMs = (VMs, newVal) => {
     const parse = (val) => {
       return typeof val === 'object' ? JSON.stringify(val) : val;
     };
@@ -32,12 +32,17 @@ module.exports = (self) => {
             break;
           case ':if':
             // 这里是需要重新绑定的，坑。
-            if (newVal) {
-              vm.innerHTML = vm.$$html;
-              walk(vm, data);
+            if (newVal && vm.$$next) {
+              setTimeout(() => {
+                if (vm.$$next) vm.$$parent.insertBefore(vm, vm.$$next);
+                else vm.$$parent.appendChild(vm);
+                delete vm.$$parent;
+                delete vm.$$next;
+              });
             } else {
-              vm.$$html = vm.innerHTML;
-              vm.innerHTML = '';
+              vm.$$parent = vm.parentNode;
+              vm.$$next = vm.nextSibling;
+              setTimeout(() => {vm.parentNode.removeChild(vm);});
             }
             break;
           case ':show':
@@ -68,7 +73,7 @@ module.exports = (self) => {
     Object.defineProperty(pointers, key, {
       set: function(newVal) {
         val = newVal;
-        setVMs(VMs, newVal, pointers);
+        setVMs(VMs, newVal);
       },
       get: function() {
         return val;
@@ -82,7 +87,7 @@ module.exports = (self) => {
     if (typeof pointers === 'object' && !pointers.length) {
       for (var key in pointers) {
         var child = pointers[key];
-        var isObj = typeof child === 'object' && !child.length;
+        var isObj = child && typeof child === 'object' && !child.length;
         var VMs;
         if (isObj) {
           if (!child.$$name) child.$$name = key;
