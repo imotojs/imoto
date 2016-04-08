@@ -15,13 +15,16 @@
 ## 实例化
 
 ```
-var vm = new Imoto({
-  el: ...,
-  data: ...,
-  methods: ...,
-  component: ...,
-  created: ...,
-  ready: ...,
-  template: ...,
-});
+class example extends Imoto {
+  get data() {...},
+  get methods() {...},
+  get component() {...},
+  get created() {...},
+  get ready() {...},
+  get template() {...},
+);
+
+<script>
+  (new example()).render('body')
+</script>
 ``` 
