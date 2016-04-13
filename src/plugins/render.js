@@ -11,10 +11,11 @@ module.exports = (self) => {
       return typeof val === 'object' ? JSON.stringify(val) : val;
     };
     const deal = (vm, key) => {
-      if (key.indexOf('@') === 0) {
-        if (typeof newVal !== 'function') return console.error('Imoto Warning: should\'t set method as not a function');
-        // bind events
-        vm.addEventListener(key.substr(1, key.length - 1), newVal.bind(self.$$pointers));
+      if (key.indexOf('$') === 0) {
+        // replace
+        if (vm.$$value.indexOf(vm.$$param) !== 0) vm.$$temp = vm.$$value;
+        vm.$$value = vm.$$temp.replace(`{{${vm.$$param}}}`, parse(newVal));
+        vm.nodeValue = vm.$$value;
       } else if (key.indexOf(':') === 0) {
         if (typeof newVal === 'function') return console.error('Imoto Warning: should\'t set data or prop as a function');
         // bind datas
@@ -30,12 +31,21 @@ module.exports = (self) => {
             break;
           case ':for':
             for (var item in vm) {
-              vm[item].$$parent = vm[item].parentNode;
+              if (vm[item].parentNode) {
+                vm[item].$$parent = vm[item].parentNode;
+                vm[item].$$parent.removeChild(vm[item]);
+              }
               vm[item].$$parent.$$forArr = vm[item].$$parent.$$forArr || [];
+              vm[item].$$parent.$$forArr.forEach((node) => {
+                vm[item].$$parent.removeChild(node);
+              });
+              vm[item].$$parent.$$forArr = [];
               newVal.forEach((itemVal, index) => {
                 // 同样需要记住父节点
-                walk(vm[item].cloneNode(true), {$index: index, [item]: itemVal});
-                vm[item].$$parent.appendChild(vm[item]);
+                var node = vm[item].cloneNode(true);
+                walk(node, {$index: index, [item]: itemVal});
+                vm[item].$$parent.$$forArr.push(node);
+                vm[item].$$parent.appendChild(node);
               });
             }
             break;
@@ -60,6 +70,10 @@ module.exports = (self) => {
           case ':value.sync':
             break;
         }
+      } else if (key.indexOf('@') === 0) {
+        if (typeof newVal !== 'function') return console.error('Imoto Warning: should\'t set method as not a function');
+        // bind events
+        // vm.addEventListener(key.substr(1, key.length - 1), newVal.bind(self.$$pointers));
       }
     };
     for (var key in VMs) {

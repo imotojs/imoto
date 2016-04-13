@@ -16,6 +16,16 @@ module.exports = {
       if (node.nodeType === 1) {
         toArr(node.attributes).forEach((attr) => {
           var {name, nodeValue} = attr;
+          var params = nodeValue.match(/{{(.*?)}}/g);
+          params = params ? params.map((item) => {return item.replace(/[ {}]/g, '');}) : params;
+          if (params && params.indexOf(value) !== -1) {
+            attr.$$temp = nodeValue;
+            attr.$$value = nodeValue;
+            attr.$$param = value;
+            if (!VMs.$reps) VMs.$reps = [attr];
+            else VMs.$reps.push(attr);
+            attr.nodeValue = nodeValue.replace(`{{${value}}}`, '');
+          }
           if (name === ':for') {
             var keyVal = nodeValue.split(' in ');
             if (keyVal.length === 2 && keyVal[1] === value) {
@@ -23,9 +33,15 @@ module.exports = {
               else VMs[name].push({[keyVal[0]]: node});
               node.removeAttribute(name);
             }
-          } else if (name.search(/[:@]/) === 0 && value === nodeValue) {
+          } else if (name.indexOf(':') === 0 && value === nodeValue) {
             if (!VMs[name]) VMs[name] = [node];
             else VMs[name].push(node);
+            node.removeAttribute(name);
+          } else if (name.indexOf('@') === 0 && (nodeValue === value || nodeValue.indexOf(`${value}(`) === 0)) {
+            var args = nodeValue.match(/\((.*)\)/);
+            args = args ? args[1] : '$';
+            if (!VMs[name]) VMs[name] = [{args, node}];
+            else VMs[name].push({args, node});
             node.removeAttribute(name);
           }
         });
