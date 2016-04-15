@@ -29,6 +29,14 @@ module.exports = (self) => {
             vm.value = parse(newVal);
             break;
           case ':for':
+            for (var item in vm) {
+              vm.$$html = vm.innerHTML;
+              vm.innerHTML = '';
+              newVal.forEach((itemVal, index) => {
+                itemVal.$index = index;
+                walk(vm[item], itemVal);
+              });
+            }
             break;
           case ':if':
             // 这里是需要重新绑定的，坑。
