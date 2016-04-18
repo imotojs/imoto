@@ -30,11 +30,12 @@ module.exports = (self) => {
             break;
           case ':for':
             for (var item in vm) {
-              vm.$$html = vm.innerHTML;
-              vm.innerHTML = '';
+              vm[item].$$parent = vm[item].parentNode;
+              vm[item].$$parent.$$forArr = vm[item].$$parent.$$forArr || [];
               newVal.forEach((itemVal, index) => {
-                itemVal.$index = index;
-                walk(vm[item], itemVal);
+                // 同样需要记住父节点
+                walk(vm[item].cloneNode(true), {$index: index, [item]: itemVal});
+                vm[item].$$parent.appendChild(vm[item]);
               });
             }
             break;
