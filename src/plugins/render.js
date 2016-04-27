@@ -16,6 +16,17 @@ module.exports = (self) => {
         if (vm.$$value.indexOf(vm.$$param) !== 0) vm.$$temp = vm.$$value;
         vm.$$value = vm.$$temp.replace(`{{${vm.$$param}}}`, parse(newVal));
         vm.nodeValue = vm.$$value;
+      } else if (key.indexOf('@') === 0) {
+        if (typeof newVal !== 'function') return console.error('Imoto Warning: should\'t set method as not a function');
+        // bind events
+        vm.node.addEventListener(key.substr(1, key.length - 1), () => {
+          // 解析当前需要的变量
+          var argNames = vm.args.split(',').map((item) => {return item.trim();});
+          var args = argNames.map((key) => {
+            return vm.node.$$params[key];
+          });
+          newVal.apply(self.$$pointers, args);
+        });
       } else if (key.indexOf(':') === 0) {
         if (typeof newVal === 'function') return console.error('Imoto Warning: should\'t set data or prop as a function');
         // bind datas
@@ -69,11 +80,12 @@ module.exports = (self) => {
             break;
           case ':value.sync':
             break;
+          case ':bind':
+            // 需要apply到某个事件函数的参数
+            if (!vm.node.$$params) vm.node.$$params = {};
+            vm.node.$$params[vm.value] = newVal;
+            break;
         }
-      } else if (key.indexOf('@') === 0) {
-        if (typeof newVal !== 'function') return console.error('Imoto Warning: should\'t set method as not a function');
-        // bind events
-        // vm.addEventListener(key.substr(1, key.length - 1), newVal.bind(self.$$pointers));
       }
     };
     for (var key in VMs) {
