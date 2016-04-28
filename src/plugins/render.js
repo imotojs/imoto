@@ -21,10 +21,8 @@ module.exports = (self) => {
         // bind events
         vm.node.addEventListener(key.substr(1, key.length - 1), () => {
           // 解析当前需要的变量
-          var argNames = vm.args.split(',').map((item) => {return item.trim();});
-          var args = argNames.map((key) => {
-            return vm.node.$$params[key];
-          });
+          var argNames = vm.args ? vm.args.split(',').map((item) => {return item.trim();}) : [];
+          var args = argNames.length ? argNames.map((key) => {return vm.node.$$params[key];}) : [];
           newVal.apply(self.$$pointers, args);
         });
       } else if (key.indexOf(':') === 0) {
