@@ -37,12 +37,17 @@ module.exports = {
             if (!VMs[name]) VMs[name] = [node];
             else VMs[name].push(node);
             node.removeAttribute(name);
-          } else if (name.indexOf('@') === 0 && (nodeValue === value || nodeValue.indexOf(`${value}(`) === 0)) {
+          } else if (name.indexOf('@') === 0) {
             var args = nodeValue.match(/\((.*)\)/);
-            args = args ? args[1] : '$';
-            if (!VMs[name]) VMs[name] = [{args, node}];
-            else VMs[name].push({args, node});
-            node.removeAttribute(name);
+            if (nodeValue === value || nodeValue.indexOf(`${value}(`) === 0) {
+              args = args ? args[1] : '$';
+              if (!VMs[name]) VMs[name] = [{args, node}];
+              else VMs[name].push({args, node});
+              node.removeAttribute(name);
+            } else if (args && args[1].indexOf(value) !== -1) {
+              if (!VMs[':bind']) VMs[':bind'] = [{value, node}];
+              else VMs[':bind'].push({value, node});
+            }
           }
         });
         if (node.hasChildNodes()) toArr(node.childNodes).forEach(walk);
