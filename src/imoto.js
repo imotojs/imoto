@@ -1,4 +1,4 @@
-const {getEl} = require('./plugins/tools');
+const {getEl} = require('./core/tools');
 
 class Imoto {
   constructor() {
@@ -17,7 +17,7 @@ class Imoto {
     this.$$dom.innerHTML = template;
     // 调用渲染
     ['pubsub', 'render', 'setStyle'].forEach((name) => {
-      require(`./plugins/${name}`)(this);
+      require(`./core/${name}`)(this);
     });
     if (ready) ready.call(pointers);
   }

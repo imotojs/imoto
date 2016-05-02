@@ -8,7 +8,12 @@ module.exports = (self) => {
   // 在初次赋值以及setter函数触发时调用，为当前变量绑定的VM完成指定行为
   const setVMs = (VMs, newVal) => {
     const parse = (val) => {
-      return typeof val === 'object' ? JSON.stringify(val) : val;
+      if (typeof val === 'object') {
+        val = JSON.parse(JSON.stringify(val));
+        delete val.$$name;
+        return JSON.stringify(val);
+      }
+      return val;
     };
     const deal = (vm, key) => {
       if (key.indexOf('$') === 0) {
