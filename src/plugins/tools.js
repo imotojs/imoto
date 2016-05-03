@@ -40,7 +40,7 @@ module.exports = {
           } else if (name.indexOf('@') === 0) {
             var args = nodeValue.match(/\((.*)\)/);
             if (nodeValue === value || nodeValue.indexOf(`${value}(`) === 0) {
-              args = args ? args[1] : '$';
+              args = args ? args[1] : '';
               if (!VMs[name]) VMs[name] = [{args, node}];
               else VMs[name].push({args, node});
               node.removeAttribute(name);
