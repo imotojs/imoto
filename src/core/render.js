@@ -6,9 +6,14 @@ const {attrEls} = require('./tools');
 
 module.exports = (self) => {
   // 在初次赋值以及setter函数触发时调用，为当前变量绑定的VM完成指定行为
-  const setVMs = (VMs, newVal) => {
+  const setVMs = (VMs, newVal, pointers, pointerKey) => {
     const parse = (val) => {
-      return typeof val === 'object' ? JSON.stringify(val) : val;
+      if (typeof val === 'object') {
+        val = JSON.parse(JSON.stringify(val));
+        delete val.$$name;
+        return JSON.stringify(val);
+      }
+      return val;
     };
     const deal = (vm, key) => {
       if (key.indexOf('$') === 0) {
@@ -19,12 +24,16 @@ module.exports = (self) => {
       } else if (key.indexOf('@') === 0) {
         if (typeof newVal !== 'function') return console.error('Imoto Warning: should\'t set method as not a function');
         // bind events
-        vm.node.addEventListener(key.substr(1, key.length - 1), () => {
+        var method = () => {
           // 解析当前需要的变量
           var argNames = vm.args ? vm.args.split(',').map((item) => {return item.trim();}) : [];
           var args = argNames.length ? argNames.map((key) => {return vm.node.$$params[key];}) : [];
           newVal.apply(self.$$pointers, args);
-        });
+        };
+        var name = key.substr(1, key.length - 1);
+        if (vm.node[`$$${name}`]) vm.node.removeEventListener(vm.node[`$$${name}`]);
+        vm.node[`$$${name}`] = method;
+        vm.node.addEventListener(name, vm.node.$$method);
       } else if (key.indexOf(':') === 0) {
         if (typeof newVal === 'function') return console.error('Imoto Warning: should\'t set data or prop as a function');
         // bind datas
@@ -83,6 +92,15 @@ module.exports = (self) => {
             if (!vm.node.$$params) vm.node.$$params = {};
             vm.node.$$params[vm.value] = newVal;
             break;
+          case ':model':
+            vm.value = newVal;
+            if (!vm.$$model) {
+              vm.$$model = function(newVal) {
+                pointers[pointerKey] = event.target.value;
+              };
+              vm.addEventListener('input', vm.$$model.bind(self.$$pointers));
+            }
+            break;
         }
       }
     };
@@ -94,9 +112,9 @@ module.exports = (self) => {
   };
 
   // 通过指定属性值获取当前组件所有该属性值VM
-  const getVMs = (dom, name, val) => {
+  const getVMs = (dom, name, val, pointers, key) => {
     var VMs = attrEls(dom, name);
-    setVMs(VMs, val);
+    setVMs(VMs, val, pointers, key);
     return VMs;
   };
 
@@ -104,11 +122,11 @@ module.exports = (self) => {
   const defineProp = (pointers, key, VMs) => {
     var val;
     Object.defineProperty(pointers, key, {
-      set: function(newVal) {
+      set(newVal) {
         val = newVal;
         setVMs(VMs, newVal);
       },
-      get: function() {
+      get() {
         return val;
       }
     });
@@ -125,11 +143,11 @@ module.exports = (self) => {
         if (isObj) {
           if (!child.$$name) child.$$name = key;
           else child.$$name += `.${key}`;
-          VMs = getVMs(dom, child.$$name, child);
+          VMs = getVMs(dom, child.$$name, child, pointers, key);
           defineProp(pointers, key, VMs);
           walk(dom, child);
         } else {
-          VMs = getVMs(dom, key, child);
+          VMs = getVMs(dom, key, child, pointers, key);
           defineProp(pointers, key, VMs);
         }
       }
