@@ -56,6 +56,19 @@ module.exports = {
     walk(el);
     return VMs;
   },
+  extend(prop, copy) {
+    if (prop === null || typeof prop !== 'object') return prop;
+    if (prop.constructor !== Object && prop.constructor !== Array) return prop;
+    if (prop.constructor === Date || prop.constructor === RegExp || prop.constructor === Function ||
+      prop.constructor === String || prop.constructor === Number || prop.constructor === Boolean) return new prop.constructor(prop);
+
+    copy = copy || new prop.constructor();
+
+    for (var name in prop) {
+      copy[name] = typeof copy[name] === 'undefined' ? module.exports.extend(prop[name], null) : copy[name];
+    }
+    return copy;
+  },
   getVal(obj, str) {},
   setVal(obj, str, value) {}
 };

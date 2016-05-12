@@ -1,4 +1,4 @@
-const {attrEls} = require('./tools');
+const {attrEls, extend} = require('./tools');
 
 // [{if: el1, show: el2, text: el3, html: el4}]
 // bindVM，这里在一个对象的某个属性发生变化时需要告知所有的父属性，并在deepwatch时触发其事件
@@ -33,7 +33,7 @@ module.exports = (self) => {
         var name = key.substr(1, key.length - 1);
         if (vm.node[`$$${name}`]) vm.node.removeEventListener(vm.node[`$$${name}`]);
         vm.node[`$$${name}`] = method;
-        vm.node.addEventListener(name, vm.node.$$method);
+        vm.node.addEventListener(name, vm.node[`$$${name}`]);
       } else if (key.indexOf(':') === 0) {
         if (typeof newVal === 'function') return console.error('Imoto Warning: should\'t set data or prop as a function');
         // bind datas
@@ -61,7 +61,7 @@ module.exports = (self) => {
               newVal.forEach((itemVal, index) => {
                 // 同样需要记住父节点
                 var node = vm[item].cloneNode(true);
-                walk(node, {$index: index, [item]: itemVal});
+                walk(node, extend(self.$$pointers, {$index: index, [item]: itemVal}));
                 vm[item].$$parent.$$forArr.push(node);
                 vm[item].$$parent.appendChild(node);
               });
@@ -120,7 +120,8 @@ module.exports = (self) => {
 
   // 重写pointers所有属性
   const defineProp = (pointers, key, VMs) => {
-    var val;
+    var val = pointers[key];
+    if (pointers[key] instanceof Function) return;
     Object.defineProperty(pointers, key, {
       set(newVal) {
         val = newVal;
@@ -138,7 +139,7 @@ module.exports = (self) => {
     if (typeof pointers === 'object' && !pointers.length) {
       for (var key in pointers) {
         var child = pointers[key];
-        var isObj = child && typeof child === 'object' && !child.length;
+        var isObj = child && typeof child === 'object';
         var VMs;
         if (isObj) {
           if (!child.$$name) child.$$name = key;
