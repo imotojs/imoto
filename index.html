@@ -9,29 +9,52 @@
 </body>
 <script type="text/javascript" src="dist/imoto.js"></script>
 <script type="text/javascript">
-  new Imoto({
-    el: 'body',
-    styleSheet: '.lala{border: 1px}',
-    data: {
-      hehe: false
-    },
-    created: function() {
-    },
-    ready: function() {
-      this.hehe = true;
-    },
-    methods: {
-      duang: function() {
-        this.hehe = !this.hehe;
-      },
-      lala: function() {
-        console.log(this.hehe);
+  class example extends Imoto {
+    get styleSheet() {
+      return `.lala{border: 1px solid #eee;}`
+    }
+    get data() {
+      return {
+        hehe: false,
+        items: ['11', '22', {a: 333}],
+        val: ''
       }
-    },
-    template: `
-      <button @click="duang">duang</button>
-      <div class="lala" :if="hehe" :text="hehe" @click="lala"></div>
-    `
-  });
+    }
+    created() {
+
+    }
+    ready() {
+      this.hehe = true;
+    }
+    get methods() {
+      return {
+        duang: function() {
+          this.hehe = !this.hehe;
+          this.items = ['11', '22'];
+        },
+        lala: function() {
+          console.log(this.hehe);
+        },
+        itemClick: function(index) {
+          console.log(index);
+        },
+        input: function() {
+          console.log(this.val);
+        }
+      }
+    }
+    get template() {
+      return `
+        <button @click="duang">duang</button>
+        <input @input="input" :model="val">
+        <div :text="val"></div>
+        <div class="lala" :if="hehe" :text="hehe" @click="lala"></div>
+        <a :for="item in items">
+          <span :text="item" @click="itemClick($index, item)"></span>
+        </a>
+      `
+    }
+  };
+  (new example()).render('body');
 </script>
 </html>
