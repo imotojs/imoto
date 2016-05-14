@@ -9,49 +9,64 @@
 </body>
 <script type="text/javascript" src="dist/imoto.js"></script>
 <script type="text/javascript">
+  class sidebar extends Imoto {
+    get template() {
+      return `<div>123</div>`;
+    }
+  }
   class example extends Imoto {
     get styleSheet() {
-      return `.lala{border: 1px solid #eee;}`
+      return `
+        html, body {
+          margin: 0;
+          padding: 0;
+        }
+        .header {
+          line-height: 40px;
+        }
+        .headercontent {
+          width: 1000px;
+          margin: 0 auto;
+          display: flex;
+        }
+        .headercontent-title {
+          font-size: 20px;
+          flex: 1;
+        }
+        .headercontent-href {
+          width: 300px;
+        }
+      `
     }
     get data() {
       return {
-        hehe: false,
-        items: ['11', '22', {a: 333}],
-        val: ''
       }
     }
     created() {
 
     }
     ready() {
-      this.hehe = true;
+    }
+    get components() {
+      return {sidebar};
     }
     get methods() {
-      return {
-        duang: function() {
-          this.hehe = !this.hehe;
-          this.items = ['11', '22'];
-        },
-        lala: function() {
-          console.log(this.hehe);
-        },
-        itemClick: function(index) {
-          console.log(index);
-        },
-        input: function() {
-          console.log(this.val);
-        }
-      }
     }
     get template() {
       return `
-        <button @click="duang">duang</button>
-        <input @input="input" :model="val">
-        <div :text="val"></div>
-        <div class="lala" :if="hehe" :text="hehe" @click="lala"></div>
-        <a :for="item in items">
-          <span :text="item" @click="itemClick($index, item)"></span>
-        </a>
+        <header class="header">
+          <div class="headercontent">
+            <div class="headercontent-title">Imoto example</div>
+            <div class="headercontent-href">
+              <a>install</a>
+              <a>about</a>
+              <a>github</a>
+            </div>
+          </div>
+        </header>
+        <div class="content">
+          <sidebar></sidebar>
+        </div>
       `
     }
   };

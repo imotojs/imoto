@@ -85,6 +85,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var styleSheet = this.styleSheet;
 	    var created = this.created;
 	    var ready = this.ready;
+	    var components = this.components;
 
 	    [props, data, methods].forEach(function (obj) {
 	      if (!obj) return;
@@ -97,8 +98,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (created) created.call(pointers);
 	    this.$$dom = document.createElement('div');
 	    this.$$dom.innerHTML = template;
+	    this.$$components = components;
 	    // 调用渲染
-	    ['pubsub', 'render', 'setStyle'].forEach(function (name) {
+	    ['pubsub', 'render', 'setStyle', 'components'].forEach(function (name) {
 	      __webpack_require__(3)("./" + name)(_this);
 	    });
 	    if (ready) ready.call(pointers);
@@ -211,12 +213,14 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var map = {
-		"./pubsub": 4,
-		"./pubsub.js": 4,
-		"./render": 5,
-		"./render.js": 5,
-		"./setStyle": 6,
-		"./setStyle.js": 6,
+		"./components": 4,
+		"./components.js": 4,
+		"./pubsub": 5,
+		"./pubsub.js": 5,
+		"./render": 6,
+		"./render.js": 6,
+		"./setStyle": 7,
+		"./setStyle.js": 7,
 		"./tools": 2,
 		"./tools.js": 2
 	};
@@ -240,6 +244,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 
+	module.exports = function (self) {};
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	"use strict";
+
 	module.exports = function (self) {
 	  self.$on = function (name, callback) {};
 	  self.$emit = function (name) {};
@@ -248,7 +260,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -424,7 +436,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
