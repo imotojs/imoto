@@ -101,6 +101,11 @@ module.exports = (self) => {
               vm.addEventListener('input', vm.$$model.bind(self.$$pointers));
             }
             break;
+          default:
+            if (!self.$childs) return;
+            var child = self.$childs[vm.$$id];
+            if (child) child.$$pointers[key.slice(1)] = newVal;
+            break;
         }
       }
     };
