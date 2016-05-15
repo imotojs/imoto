@@ -98,7 +98,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (created) created.call(pointers);
 	    this.$$dom = document.createElement('div');
 	    this.$$dom.innerHTML = template;
-	    this.$$components = components;
+	    this.$$components = components || {};
 	    // 调用渲染
 	    ['pubsub', 'render', 'setStyle', 'components'].forEach(function (name) {
 	      __webpack_require__(3)("./" + name)(_this);
@@ -109,8 +109,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(Imoto, [{
 	    key: 'render',
 	    value: function render(selector) {
-	      var rootEl = getEl(selector);
-	      rootEl.appendChild(this.$$dom);
+	      (typeof selector === 'string' ? getEl(selector) : selector).appendChild(this.$$dom);
 	    }
 	  }], [{
 	    key: 'use',
@@ -240,11 +239,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 4 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
-	module.exports = function (self) {};
+	var _require = __webpack_require__(2);
+
+	var getEls = _require.getEls;
+	var toArr = _require.toArr;
+
+
+	module.exports = function (self) {
+	  for (var key in self.$$components) {
+	    var doms = toArr(getEls(key, self.$$dom));
+	    doms.forEach(function (dom) {
+	      new self.$$components[key]().render(dom);
+	    });
+	  }
+	};
 
 /***/ },
 /* 5 */
@@ -379,6 +391,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	              };
 	              vm.addEventListener('input', vm.$$model.bind(self.$$pointers));
 	            }
+	            break;
+	          default:
+	            var child = self.$$childs[vm.nodeName.toLowerCase()];
+	            if (child) child[key] = newVal;
 	            break;
 	        }
 	      }
