@@ -10,8 +10,16 @@
 <script type="text/javascript" src="dist/imoto.js"></script>
 <script type="text/javascript">
   class sidebar extends Imoto {
+    get styleSheet() {
+      return `
+        .sidebar {
+          width: 200px;
+          float: left;
+        }
+      `;
+    }
     get template() {
-      return `<div>123</div>`;
+      return `<div class="sidebar">123</div>`;
     }
   }
   class example extends Imoto {
@@ -25,6 +33,7 @@
         .header {
           line-height: 40px;
           border-bottom: 1px #eee solid;
+          margin-bottom: 20px;
         }
         .headercontent {
           width: 1000px;
@@ -37,6 +46,10 @@
         }
         .headercontent-href {
           width: 300px;
+        }
+        .content {
+          width: 1000px;
+          margin: 0 auto;
         }
       `
     }
@@ -68,6 +81,7 @@
         </header>
         <div class="content">
           <sidebar></sidebar>
+          <router-view><router-view>
         </div>
       `
     }
