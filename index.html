@@ -18,8 +18,23 @@
         }
       `;
     }
+    get props() {
+      return {
+        name: 'sidebarTitle'
+      };
+    }
+    get data() {
+      return {
+        list: ['item1', 'item2']
+      };
+    }
     get template() {
-      return `<div class="sidebar">123</div>`;
+      return `
+      <div class="sidebar">
+        <div :show="name" :text="name"></div>
+        <div :for="item in list" :text="item"></div>
+      </div>
+      `;
     }
   }
   class example extends Imoto {
