@@ -56,6 +56,12 @@ module.exports = {
     walk(el);
     return VMs;
   },
+  copyAttrs(node, pre) {
+    toArr(pre.attributes).forEach((attr) => {
+      var {name, nodeValue} = attr;
+      node.setAttribute(name, nodeValue);
+    });
+  },
   extend(prop, copy) {
     if (prop === null || typeof prop !== 'object') return prop;
     if (prop.constructor !== Object && prop.constructor !== Array) return prop;
