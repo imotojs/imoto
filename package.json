@@ -2,8 +2,25 @@
   "name": "imoto",
   "version": "0.0.0",
   "description": "simple mvvm.",
-  "main": "src/imoto.js",
-  "private": true,
+  "main": "dist/imoto.min.js",
+  "author": "youngerheart",
+  "license": "MIT",
+  "files": [
+    "README.md",
+    "dist/"
+  ],
+  "keywords": [
+    "mvvm",
+    "imoto"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/imotojs/imoto.git"
+  },
+  "bugs": {
+    "url": "https://github.com/imotojs/imoto/issues"
+  },
+  "homepage": "https://github.com/imotojs/imoto",
   "devDependencies": {
     "babel-core": "^6.4.0",
     "babel-loader": "^6.2.1",
