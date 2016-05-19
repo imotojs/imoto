@@ -20,7 +20,7 @@
     }
     get props() {
       return {
-        name: 'sidebarTitle'
+        title: 'sidebarTitle'
       };
     }
     get data() {
@@ -30,10 +30,8 @@
     }
     get template() {
       return `
-      <div class="sidebar">
-        <div :show="name" :text="name"></div>
+        <div :show="title" :text="title"></div>
         <div :for="item in list" :text="item"></div>
-      </div>
       `;
     }
   }
@@ -60,20 +58,24 @@
           flex: 1;
         }
         .headercontent-href {
-          width: 300px;
+          width: 200px;
         }
-        .content {
+        .container {
           width: 1000px;
           margin: 0 auto;
+        }
+        .content {
+          margin-left: 220px;
         }
       `
     }
     get data() {
       return {
-      }
+        newval: 'newtitle'
+      };
     }
     created() {
-
+      console.log(this);
     }
     ready() {
     }
@@ -81,6 +83,11 @@
       return {sidebar};
     }
     get methods() {
+      return {
+        changeTitle() {
+          this.newval = 'another new title';
+        }
+      };
     }
     get template() {
       return `
@@ -94,9 +101,12 @@
             </div>
           </div>
         </header>
-        <div class="content">
-          <sidebar></sidebar>
-          <router-view><router-view>
+        <div class="container">
+          <sidebar :title="newval" class="sidebar"></sidebar>
+          <div class="content">
+            click to change sidebar title<button @click="changeTitle">click</button>
+            <router-view><router-view>
+          </div>
         </div>
       `
     }

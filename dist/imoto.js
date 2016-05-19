@@ -70,9 +70,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _require = __webpack_require__(2);
 
 	var getEl = _require.getEl;
+	var copyAttrs = _require.copyAttrs;
 
 	var Imoto = function () {
-	  function Imoto() {
+	  function Imoto(parent) {
 	    var _this = this;
 
 	    _classCallCheck(this, Imoto);
@@ -93,14 +94,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        pointers[key] = obj[key];
 	      }
 	    });
+	    if (parent) this.$parent = parent;
 	    this.$$pointers = pointers;
 	    this.$$styleSheet = styleSheet;
 	    if (created) created.call(pointers);
 	    this.$$dom = document.createElement('div');
 	    this.$$dom.innerHTML = template;
+	    this.$$dom.$$id = Math.random().toString();
 	    this.$$components = components || {};
+	    if (this.$parent) this.$root = this.$parent.$root;else this.$root = this;
 	    // 调用渲染
-	    ['pubsub', 'render', 'setStyle', 'components'].forEach(function (name) {
+	    ['pubsub', 'components', 'render', 'setStyle'].forEach(function (name) {
 	      __webpack_require__(3)("./" + name)(_this);
 	    });
 	    if (ready) ready.call(pointers);
@@ -109,7 +113,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(Imoto, [{
 	    key: 'render',
 	    value: function render(selector) {
-	      (typeof selector === 'string' ? getEl(selector) : selector).appendChild(this.$$dom);
+	      if (typeof selector === 'string') getEl(selector).appendChild(this.$$dom);else {
+	        if (selector.nextSibling) selector.parentNode.insertBefore(this.$$dom, selector.nextSibling);else selector.parentNode.appendChild(this.$$dom);
+	        // 遍历属性
+	        copyAttrs(this.$$dom, selector);
+	        selector.parentNode.removeChild(selector);
+	      };
 	    }
 	  }], [{
 	    key: 'use',
@@ -191,6 +200,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    walk(el);
 	    return VMs;
 	  },
+	  copyAttrs: function copyAttrs(node, pre) {
+	    toArr(pre.attributes).forEach(function (attr) {
+	      var name = attr.name;
+	      var nodeValue = attr.nodeValue;
+
+	      node.setAttribute(name, nodeValue);
+	    });
+	  },
 	  extend: function extend(prop, copy) {
 	    if (prop === null || (typeof prop === 'undefined' ? 'undefined' : _typeof(prop)) !== 'object') return prop;
 	    if (prop.constructor !== Object && prop.constructor !== Array) return prop;
@@ -253,7 +270,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  for (var key in self.$$components) {
 	    var doms = toArr(getEls(key, self.$$dom));
 	    doms.forEach(function (dom) {
-	      new self.$$components[key]().render(dom);
+	      var child = new self.$$components[key](self);
+	      if (!self.$childs) self.$childs = {};
+	      self.$childs[child.$$dom.$$id] = child;
+	      child.render(dom);
 	    });
 	  }
 	};
@@ -393,8 +413,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            break;
 	          default:
-	            var child = self.$$childs[vm.nodeName.toLowerCase()];
-	            if (child) child[key] = newVal;
+	            if (!self.$childs) return;
+	            var child = self.$childs[vm.$$id];
+	            if (child) child.$$pointers[key.slice(1)] = newVal;
 	            break;
 	        }
 	      }
