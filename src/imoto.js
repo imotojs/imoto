@@ -38,7 +38,7 @@ class Imoto {
     };
   }
   static use(plugin) {
-    plugin(this);
+    plugin.init(this);
   }
 }
 
