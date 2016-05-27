@@ -1,6 +1,6 @@
 {
   "name": "imoto",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "simple mvvm.",
   "main": "dist/imoto.min.js",
   "author": "youngerheart",
