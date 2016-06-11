@@ -72,6 +72,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	var getEl = _require.getEl;
 	var copyAttrs = _require.copyAttrs;
 
+	var defineComponents = __webpack_require__(3);
+
+	var core = {};
+	['pubsub', 'components', 'render', 'setStyle'].forEach(function (name) {
+	  core[name] = __webpack_require__(5)("./" + name);
+	});
+
 	var Imoto = function () {
 	  function Imoto(parent) {
 	    var _this = this;
@@ -88,6 +95,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var ready = this.ready;
 	    var components = this.components;
 
+	    defineComponents(this);
 	    [props, data, methods].forEach(function (obj) {
 	      if (!obj) return;
 	      for (var key in obj) {
@@ -105,7 +113,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (this.$parent) this.$root = this.$parent.$root;else this.$root = this;
 	    // 调用渲染
 	    ['pubsub', 'components', 'render', 'setStyle'].forEach(function (name) {
-	      __webpack_require__(3)("./" + name)(_this);
+	      core[name](_this);
 	    });
 	    if (ready) ready.call(pointers);
 	  }
@@ -123,7 +131,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }], [{
 	    key: 'use',
 	    value: function use(plugin) {
-	      plugin(this);
+	      plugin.init(this);
 	    }
 	  }]);
 
@@ -228,31 +236,31 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var map = {
-		"./components": 4,
-		"./components.js": 4,
-		"./pubsub": 5,
-		"./pubsub.js": 5,
-		"./render": 6,
-		"./render.js": 6,
-		"./setStyle": 7,
-		"./setStyle.js": 7,
-		"./tools": 2,
-		"./tools.js": 2
-	};
-	function webpackContext(req) {
-		return __webpack_require__(webpackContextResolve(req));
-	};
-	function webpackContextResolve(req) {
-		return map[req] || (function() { throw new Error("Cannot find module '" + req + "'.") }());
-	};
-	webpackContext.keys = function webpackContextKeys() {
-		return Object.keys(map);
-	};
-	webpackContext.resolve = webpackContextResolve;
-	module.exports = webpackContext;
-	webpackContext.id = 3;
+	'use strict';
 
+	var components = __webpack_require__(4);
+
+	module.exports = function (self) {
+	  var val;
+	  Object.defineProperty(self, 'components', {
+	    set: function set(newVal) {
+	      val = newVal;
+	      var keys = Object.keys(newVal);
+	      for (var key in self.$childs) {
+	        var child = self.$childs[key];
+	        if (keys.indexOf(child.$$name) === -1) {
+	          child.$$dom.parentNode.removeChild(child.$$dom);
+	          delete self.$childs[key];
+	        }
+	      }
+	      self.$components = newVal;
+	      components(self);
+	    },
+	    get: function get() {
+	      return val;
+	    }
+	  });
+	};
 
 /***/ },
 /* 4 */
@@ -271,6 +279,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var doms = toArr(getEls(key, self.$$dom));
 	    doms.forEach(function (dom) {
 	      var child = new self.$$components[key](self);
+	      child.$$name = key;
 	      if (!self.$childs) self.$childs = {};
 	      self.$childs[child.$$dom.$$id] = child;
 	      child.render(dom);
@@ -280,6 +289,38 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var map = {
+		"./components": 4,
+		"./components.js": 4,
+		"./define-components": 3,
+		"./define-components.js": 3,
+		"./pubsub": 6,
+		"./pubsub.js": 6,
+		"./render": 7,
+		"./render.js": 7,
+		"./setStyle": 8,
+		"./setStyle.js": 8,
+		"./tools": 2,
+		"./tools.js": 2
+	};
+	function webpackContext(req) {
+		return __webpack_require__(webpackContextResolve(req));
+	};
+	function webpackContextResolve(req) {
+		return map[req] || (function() { throw new Error("Cannot find module '" + req + "'.") }());
+	};
+	webpackContext.keys = function webpackContextKeys() {
+		return Object.keys(map);
+	};
+	webpackContext.resolve = webpackContextResolve;
+	module.exports = webpackContext;
+	webpackContext.id = 5;
+
+
+/***/ },
+/* 6 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -292,7 +333,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -473,7 +514,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

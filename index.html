@@ -75,7 +75,7 @@
       };
     }
     created() {
-      console.log(this);
+      // console.log(this);
     }
     ready() {
     }
@@ -108,9 +108,11 @@
             <router-view><router-view>
           </div>
         </div>
-      `
+      `;
     }
   };
-  (new example()).render('body');
+  var e = new example();
+  e.render('body');
+  e.components = {};
 </script>
 </html>
