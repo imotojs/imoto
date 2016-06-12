@@ -1,10 +1,17 @@
 const {getEl, copyAttrs} = require('./core/tools');
+const defineComponents = require('./core/define-components');
+
+let core = {};
+['pubsub', 'components', 'render', 'setStyle'].forEach((name) => {
+  core[name] = require(`./core/${name}`);
+});
 
 class Imoto {
   constructor(parent) {
     var pointers = {};
     var {props, data, methods, template,
       styleSheet, created, ready, components} = this;
+    defineComponents(this);
     [props, data, methods].forEach((obj) => {
       if (!obj) return;
       for (var key in obj) {
@@ -23,7 +30,7 @@ class Imoto {
     else this.$root = this;
     // 调用渲染
     ['pubsub', 'components', 'render', 'setStyle'].forEach((name) => {
-      require(`./core/${name}`)(this);
+      core[name](this);
     });
     if (ready) ready.call(pointers);
   }

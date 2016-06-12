@@ -5,6 +5,7 @@ module.exports = (self) => {
     var doms = toArr(getEls(key, self.$$dom));
     doms.forEach((dom) => {
       var child = new self.$$components[key](self);
+      child.$$name = key;
       if (!self.$childs) self.$childs = {};
       self.$childs[child.$$dom.$$id] = child;
       child.render(dom);
