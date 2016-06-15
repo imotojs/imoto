@@ -80,7 +80,7 @@
     ready() {
     }
     get components() {
-      return {sidebar};
+      return {};
     }
     get methods() {
       return {
@@ -113,6 +113,6 @@
   };
   var e = new example();
   e.render('body');
-  e.components = {};
+  e.setComponent('sidebar', sidebar);
 </script>
 </html>

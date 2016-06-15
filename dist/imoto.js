@@ -70,13 +70,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _require = __webpack_require__(2);
 
 	var getEl = _require.getEl;
+	var getEls = _require.getEls;
+	var toArr = _require.toArr;
 	var copyAttrs = _require.copyAttrs;
 
-	var defineComponents = __webpack_require__(3);
 
 	var core = {};
 	['pubsub', 'components', 'render', 'setStyle'].forEach(function (name) {
-	  core[name] = __webpack_require__(5)("./" + name);
+	  core[name] = __webpack_require__(3)("./" + name);
 	});
 
 	var Imoto = function () {
@@ -95,7 +96,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var ready = this.ready;
 	    var components = this.components;
 
-	    defineComponents(this);
 	    [props, data, methods].forEach(function (obj) {
 	      if (!obj) return;
 	      for (var key in obj) {
@@ -127,6 +127,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	        copyAttrs(this.$$dom, selector);
 	        selector.parentNode.removeChild(selector);
 	      };
+	    }
+	  }, {
+	    key: 'setComponent',
+	    value: function setComponent(name, Component) {
+	      var _this2 = this;
+
+	      for (var key in this.$childs) {
+	        var oldChild = this.$childs[key];
+	        if (oldChild.$$name === name) {
+	          oldChild.$$dom.parentNode.removeChild(oldChild.$$dom);
+	          delete this.$childs[key];
+	        }
+	      }
+	      var doms = toArr(getEls(name, this.$$dom));
+	      doms.forEach(function (dom) {
+	        var child = new Component(_this2);
+	        child.$$name = name;
+	        if (!_this2.$childs) _this2.$childs = {};
+	        dom.$$id = child.$$dom.$$id;
+	        _this2.$childs[child.$$dom.$$id] = child;
+	        child.render(dom);
+	      });
 	    }
 	  }], [{
 	    key: 'use',
@@ -236,72 +258,15 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
-
-	var components = __webpack_require__(4);
-
-	module.exports = function (self) {
-	  var val;
-	  Object.defineProperty(self, 'components', {
-	    set: function set(newVal) {
-	      val = newVal;
-	      var keys = Object.keys(newVal);
-	      for (var key in self.$childs) {
-	        var child = self.$childs[key];
-	        if (keys.indexOf(child.$$name) === -1) {
-	          child.$$dom.parentNode.removeChild(child.$$dom);
-	          delete self.$childs[key];
-	        }
-	      }
-	      self.$components = newVal;
-	      components(self);
-	    },
-	    get: function get() {
-	      return val;
-	    }
-	  });
-	};
-
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _require = __webpack_require__(2);
-
-	var getEls = _require.getEls;
-	var toArr = _require.toArr;
-
-
-	module.exports = function (self) {
-	  for (var key in self.$$components) {
-	    var doms = toArr(getEls(key, self.$$dom));
-	    doms.forEach(function (dom) {
-	      var child = new self.$$components[key](self);
-	      child.$$name = key;
-	      if (!self.$childs) self.$childs = {};
-	      self.$childs[child.$$dom.$$id] = child;
-	      child.render(dom);
-	    });
-	  }
-	};
-
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
 	var map = {
 		"./components": 4,
 		"./components.js": 4,
-		"./define-components": 3,
-		"./define-components.js": 3,
-		"./pubsub": 6,
-		"./pubsub.js": 6,
-		"./render": 7,
-		"./render.js": 7,
-		"./setStyle": 8,
-		"./setStyle.js": 8,
+		"./pubsub": 5,
+		"./pubsub.js": 5,
+		"./render": 6,
+		"./render.js": 6,
+		"./setStyle": 7,
+		"./setStyle.js": 7,
 		"./tools": 2,
 		"./tools.js": 2
 	};
@@ -316,11 +281,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	webpackContext.resolve = webpackContextResolve;
 	module.exports = webpackContext;
-	webpackContext.id = 5;
+	webpackContext.id = 3;
 
 
 /***/ },
-/* 6 */
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _require = __webpack_require__(2);
+
+	var getEls = _require.getEls;
+	var toArr = _require.toArr;
+
+
+	module.exports = function (self) {
+	  for (var key in self.components) {
+	    var doms = toArr(getEls(key, self.$$dom));
+	    doms.forEach(function (dom) {
+	      var child = new self.components[key](self);
+	      child.$$name = key;
+	      if (!self.$childs) self.$childs = {};
+	      self.$childs[child.$$dom.$$id] = child;
+	      child.render(dom);
+	    });
+	  }
+	};
+
+/***/ },
+/* 5 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -333,7 +323,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 7 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -514,7 +504,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 8 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
