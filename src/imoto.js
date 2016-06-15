@@ -1,5 +1,4 @@
-const {getEl, copyAttrs} = require('./core/tools');
-const defineComponents = require('./core/define-components');
+const {getEl, getEls, toArr, copyAttrs} = require('./core/tools');
 
 let core = {};
 ['pubsub', 'components', 'render', 'setStyle'].forEach((name) => {
@@ -11,7 +10,6 @@ class Imoto {
     var pointers = {};
     var {props, data, methods, template,
       styleSheet, created, ready, components} = this;
-    defineComponents(this);
     [props, data, methods].forEach((obj) => {
       if (!obj) return;
       for (var key in obj) {
@@ -43,6 +41,24 @@ class Imoto {
       copyAttrs(this.$$dom, selector);
       selector.parentNode.removeChild(selector);
     };
+  }
+  setComponent(name, Component) {
+    for (var key in this.$childs) {
+      var oldChild = this.$childs[key];
+      if (oldChild.$$name === name) {
+        oldChild.$$dom.parentNode.removeChild(oldChild.$$dom);
+        delete this.$childs[key];
+      }
+    }
+    var doms = toArr(getEls(name, this.$$dom));
+    doms.forEach((dom) => {
+      var child = new Component(this);
+      child.$$name = name;
+      if (!this.$childs) this.$childs = {};
+      dom.$$id = child.$$dom.$$id;
+      this.$childs[child.$$dom.$$id] = child;
+      child.render(dom);
+    });
   }
   static use(plugin) {
     plugin.init(this);
