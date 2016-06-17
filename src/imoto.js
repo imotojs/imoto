@@ -16,6 +16,7 @@ class Imoto {
         pointers[key] = obj[key];
       }
     });
+    this.$$directives = Imoto.directives || {};
     if (parent) this.$parent = parent;
     this.$$pointers = pointers;
     this.$$styleSheet = styleSheet;
@@ -62,6 +63,10 @@ class Imoto {
   }
   static use(plugin) {
     plugin.init(this);
+  }
+  static addDirective(name, callback) {
+    if (!this.directives) this.directives = {[name]: callback};
+    else this.directives[name] = callback;
   }
 }
 
