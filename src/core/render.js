@@ -107,6 +107,7 @@ module.exports = (self) => {
             if (child) child.$$pointers[key.slice(1)] = newVal;
             break;
         }
+        if (self.$$directives[key]) self.$$directives[key](newVal, vm);
       }
     };
     for (var key in VMs) {
